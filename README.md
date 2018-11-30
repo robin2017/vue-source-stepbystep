@@ -52,4 +52,12 @@
 + 示例
 
 ![avatar](./images/5.png)
-        
+### step6：数据代理-set时发布通知
++ 过程
+    + vm.text代理vm.data.text
+    + 对vm.text修改时，调用pub.publish()
++ 核心API
+    + Object.defineProperty()
++ 示例
+
+![avatar](./images/6.png)

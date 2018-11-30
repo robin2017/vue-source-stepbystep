@@ -2,6 +2,9 @@
  * 事件对象 ==> 对应data的一个属性
  * 两个方法：notify/addSub
  * */
+//全局变量：dep映射
+deps = {}
+
 function Dep() {
     this.subs = [];
 }
@@ -86,10 +89,29 @@ function nodeToFragment(dom, vm) {
 }
 
 /**
+ * 数据代理
+ * */
+function proxyData(vm) {
+    Object.keys(vm.data).forEach(key => {
+        Object.defineProperty(vm, key, {
+            get: function () {
+                return vm.data[key];
+            },
+            set: function (newValue) {
+                vm.data[key] = newValue;
+                //发布者发布消息，则事件对象通知
+                deps[key].notify();
+            }
+        })
+    })
+}
+
+/**
  * 构造函数
  * */
 function Vue(options) {
     this.data = options.data;
+    proxyData(this);
     let dom = document.querySelector(options.el);
     dom.appendChild(nodeToFragment(dom, this))
 }
