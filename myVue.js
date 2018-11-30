@@ -1,20 +1,50 @@
 /**
- * 解析dom
+ * 编译dom
  * */
+//全局变量：正则表达式
+regEx = /\{\{(.*)\}\}/;
 function compile(dom, vm) {
-
+    if (dom.nodeType === 1) {//元素节点
+        let attrs = dom.attributes;
+        for (let i = 0, attr; attr = attrs[i]; i++) {
+            if (attr.nodeName === 'v-model') {
+                let name = attr.nodeValue;
+                //data-->view （单标签input元素节点）
+                dom.value = vm.data[name];
+            }
+        }
+    } else if (dom.nodeType === 3) {//文本节点
+        if (regEx.test(dom.nodeValue)) {
+            let name = RegExp.$1.trim();
+            //data-->view （文本节点）
+            dom.nodeValue = vm.data[name];
+        }
+    }
 }
 
 /**
- * 将dom拦截到fragment
+ * dom劫持到fragment
  * */
 function nodeToFragment(dom, vm) {
+    let child,
+        fragment = document.createDocumentFragment();
+    while (child = dom.firstChild) {
+        //递归编译
+        if (child.hasChildNodes()) {
+            child = nodeToFragment(child, vm)
+        }
+        compile(child, vm);
+        fragment.appendChild(child);
 
+    }
+    return fragment;
 }
 
 /**
  * 构造函数
  * */
 function Vue(options) {
-
+    this.data = options.data;
+    let dom = document.querySelector(options.el);
+    dom.appendChild(nodeToFragment(dom, this))
 }
