@@ -3,7 +3,7 @@
  * 两个方法：notify/addSub
  * */
 //全局变量：dep映射
-deps = {}
+deps = {};
 
 function Dep() {
     this.subs = [];
@@ -57,8 +57,10 @@ function compile(dom, vm) {
                 dom.value = vm.data[name];
                 //动态view-->data (input事件)
                 dom.addEventListener('input', function (evt) {
-                    vm.data[name] = evt.target.value;
-                })
+                    vm[name] = evt.target.value;
+                });
+                let watcher = new Watcher(vm, name, dom);
+                watcher.register(deps[name])
             }
         }
     } else if (dom.nodeType === 3) {//文本节点
@@ -66,6 +68,8 @@ function compile(dom, vm) {
             let name = RegExp.$1.trim();
             //初始化data-->view （文本节点）
             dom.nodeValue = vm.data[name];
+            let watcher = new Watcher(vm, name, dom);
+            watcher.register(deps[name])
         }
     }
 }
@@ -93,6 +97,7 @@ function nodeToFragment(dom, vm) {
  * */
 function proxyData(vm) {
     Object.keys(vm.data).forEach(key => {
+        deps[key] = new Dep();
         Object.defineProperty(vm, key, {
             get: function () {
                 return vm.data[key];
