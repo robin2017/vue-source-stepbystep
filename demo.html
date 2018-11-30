@@ -3,29 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <script src="myVue.js"></script>
 </head>
 <body>
-<input id="textInput">
-<span id="textOutput"></span>
+<div id="app">
+    <input v-model="text">
+    {{text}}
+</div>
 </body>
 <script>
-    let obj = {},
-        input = document.querySelector('#textInput'),
-        output = document.querySelector('#textOutput');
-    //正向：Object.defineProperty接口的set特性
-    Object.defineProperty(obj, 'value', {
-        set: function (newValue) {
-            console.log('输出数据:', newValue);
-            //设置dom节点内容,使用innerText属性
-            output.innerText = newValue;
+    new Vue({
+        el: '#app',
+        data: {
+            text: 'robin'
         }
-    });
-    //反向：input事件
-    input.addEventListener('input', function (evt) {
-        let val = evt.target.value;
-        console.log('输入数据:', val);
-        obj.value = val;
     })
-
 </script>
 </html>
