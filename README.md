@@ -31,3 +31,11 @@
 
 ![avatar](./images/3.png)
 
+### step4:视图到数据的动态绑定
++ 原理
+    + input事件
+        + 给拥有v-model属性的节点添加input事件监听
++ 示例
+
+![avatar](./images/4.png)
+

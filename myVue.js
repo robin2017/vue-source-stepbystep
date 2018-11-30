@@ -9,14 +9,18 @@ function compile(dom, vm) {
         for (let i = 0, attr; attr = attrs[i]; i++) {
             if (attr.nodeName === 'v-model') {
                 let name = attr.nodeValue;
-                //data-->view （单标签input元素节点）
+                //初始化data-->view （单标签input元素节点）
                 dom.value = vm.data[name];
+                //动态view-->data (input事件)
+                dom.addEventListener('input',function (evt) {
+                    vm.data[name] = evt.target.value;
+                })
             }
         }
     } else if (dom.nodeType === 3) {//文本节点
         if (regEx.test(dom.nodeValue)) {
             let name = RegExp.$1.trim();
-            //data-->view （文本节点）
+            //初始化data-->view （文本节点）
             dom.nodeValue = vm.data[name];
         }
     }
