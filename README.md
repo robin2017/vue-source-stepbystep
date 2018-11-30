@@ -39,3 +39,17 @@
 
 ![avatar](./images/4.png)
 
+### step5:发布订阅模式
++ 三个角色
+    + 发布者
+        + 发布publish
+    + 订阅者
+        + 更新update
+        + 注册register
+    + 事件对象
+        + 通知notify
+        + 添加订阅者addSub
++ 示例
+
+![avatar](./images/5.png)
+        
