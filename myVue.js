@@ -6,8 +6,6 @@ function Dep() {
     this.subs = [];
 }
 
-//全局变量放在构造器上
-Dep.deps = {};
 Dep.prototype = {
     notify: function () {
         this.subs.forEach(sub => {
@@ -23,17 +21,18 @@ Dep.prototype = {
  * 订阅者 ==>对应data某个属性的一个绑定节点
  * 两个方法:update/register
  * */
-function Watcher(vm, name, dom, dep) {
+function Watcher(vm, name, dom) {
     this.vm = vm;
     this.name = name;
     this.dom = dom;
-    this.register(dep);
+    Dep.target = this;
+    this.update();
 }
 
 Watcher.prototype = {
     update: function () {
-        this.dom.value = this.vm.data[this.name];
-        this.dom.nodeValue = this.vm.data[this.name];
+        this.dom.value = this.vm[this.name];
+        this.dom.nodeValue = this.vm[this.name];
     },
     register: function (dep) {
         dep.addSub(this)
@@ -55,7 +54,7 @@ function compile(dom, vm) {
                 dom.addEventListener('input', function (evt) {
                     vm[name] = evt.target.value;
                 });
-                new Watcher(vm, name, dom, Dep.deps[name]);
+                new Watcher(vm, name, dom);
             }
         }
     } else if (dom.nodeType === 3) {//文本节点
@@ -63,7 +62,7 @@ function compile(dom, vm) {
             let name = RegExp.$1.trim();
             //初始化data-->view （文本节点）
             dom.nodeValue = vm.data[name];
-            new Watcher(vm, name, dom, Dep.deps[name]);
+            new Watcher(vm, name, dom);
         }
     }
 }
@@ -93,15 +92,20 @@ function nodeToFragment(dom, vm) {
  * */
 function proxyData(vm) {
     Object.keys(vm.data).forEach(key => {
-        Dep.deps[key] = new Dep();
+        let dep = new Dep();
         Object.defineProperty(vm, key, {
             get: function () {
+                if (Dep.target) {
+                    console.log('建立依赖:', Dep.target);
+                    dep.addSub(Dep.target);
+                    Dep.target = null;
+                }
                 return vm.data[key];
             },
             set: function (newValue) {
                 vm.data[key] = newValue;
                 //发布者发布消息，则事件对象通知
-                Dep.deps[key].notify();
+                dep.notify();
             }
         })
     })
