@@ -92,3 +92,13 @@
 
 ![avatar](./images/10.png)
 
+### step10、监听对象类型
++ 过程
+    + 将数据代理变成递归式
++ 备注
+    + 没有解析代码，不可验证
++ 示例
+
+![avatar](./images/11.png)
+
+![avatar](./images/12.png)

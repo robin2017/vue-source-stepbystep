@@ -9,13 +9,20 @@
 <div id="app">
     <input v-model="text">
     <span>{{text}}</span>
+
 </div>
 </body>
 <script>
     let vm = new Vue({
         el: '#app',
         data: {
-            text: 'robin'
+            text: 'robin',
+            author: {
+                name: 'robin',
+                company: {
+                    abbr: 'cetc28'
+                }
+            }
         }
     })
 </script>

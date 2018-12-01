@@ -88,26 +88,37 @@ function nodeToFragment(dom, vm) {
 }
 
 /**
- * 数据代理
+ * 递归式数据代理
  * */
-function proxyData(vm) {
-    Object.keys(vm.data).forEach(key => {
-        let dep = new Dep();
-        Object.defineProperty(vm, key, {
-            get: function () {
-                if (Dep.target) {
-                    console.log('建立依赖:', Dep.target);
-                    dep.addSub(Dep.target);
-                    Dep.target = null;
-                }
-                return vm.data[key];
-            },
-            set: function (newValue) {
-                vm.data[key] = newValue;
-                //发布者发布消息，则事件对象通知
-                dep.notify();
+function proxyData(vm,data) {
+    Object.keys(data).forEach(key => {
+        defineReactive(vm, key, data[key])
+        if(typeof  data[key] ==='object'){
+            proxyData(vm[key],data[key])
+        }
+    })
+}
+/**
+ * 响应式交互
+ * */
+function defineReactive(obj, key, val) {
+    console.log('建立事件对象:',obj,key,val);
+    let dep = new Dep();
+    Object.defineProperty(obj, key, {
+        get: function () {
+            if (Dep.target) {
+                console.log('建立依赖:', Dep.target);
+                dep.addSub(Dep.target);
+                Dep.target = null;
             }
-        })
+            return val;
+        },
+        set: function (newValue) {
+            //左值不能为obj[key],否则堆栈溢出
+            val = newValue;
+            //发布者发布消息，则事件对象通知
+            dep.notify();
+        }
     })
 }
 
@@ -116,7 +127,7 @@ function proxyData(vm) {
  * */
 function Vue(options) {
     this.data = options.data;
-    proxyData(this);
+    proxyData(this,this.data);
     let dom = document.querySelector(options.el);
     dom.appendChild(nodeToFragment(dom, this))
 }
